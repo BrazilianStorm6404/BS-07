@@ -1,12 +1,11 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,11 +18,13 @@ public class Drivetrain extends SubsystemBase {
     private WPI_VictorSPX        ct_rb, ct_lb;
     private MotorControllerGroup right, left;
     private DifferentialDrive    drive;
+    private double navx;
 
-    double correct,
-           P = 0.0;
+    double correct,r,l, lastDis = 0, setPoint,
+           P = 0.00017;
 
-    private DifferentialDriveOdometry m_odometry;
+    private Timer t;
+    
 
   public Drivetrain() {
 
@@ -31,6 +32,12 @@ public class Drivetrain extends SubsystemBase {
     ct_lb = new WPI_VictorSPX(Constants.Drivetrain.id_lback);
     ct_rb = new WPI_VictorSPX(Constants.Drivetrain.id_rback);
     ct_lf = new WPI_TalonSRX(Constants.Drivetrain.id_lfront);
+
+    ct_lb.setNeutralMode(NeutralMode.Brake);
+    ct_lf.setNeutralMode(NeutralMode.Brake);
+    ct_rb.setNeutralMode(NeutralMode.Brake);
+    ct_rf.setNeutralMode(NeutralMode.Brake);
+
     right = new MotorControllerGroup(ct_rf, ct_rb);
     left  = new MotorControllerGroup(ct_lf, ct_lb);
     drive = new DifferentialDrive(right, left);
@@ -40,72 +47,64 @@ public class Drivetrain extends SubsystemBase {
     ct_lf.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     ct_rf.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     ct_lf.setSensorPhase(true);
-    ct_rf.setSensorPhase(true); 
+    ct_rf.setSensorPhase(false); 
 
     resetEncoders();
 
-    m_odometry = new DifferentialDriveOdometry(new Rotation2d(), 
-    ct_lf.getSelectedSensorPosition() * (Math.PI* 0.1524)/4096, 
-    ct_rf.getSelectedSensorPosition() * (Math.PI* 0.1524)/4096);
-  
-  }
-
-  public void traction (double x, double y) {
-
-    drive.arcadeDrive(x, y);
+    t = new Timer();
 
   }
 
-  /*public void route (double vel, double dis) {
+  public void traction (double y, double x) {
 
-    correct = (dis - ((ct_lf.getSelectedSensorPosition() + ct_rf.getSelectedSensorPosition())/2)) * P;
+    drive.arcadeDrive(y, x);
+
+  }
+
+  public void route (double vel, double dis) {
+
+    if (lastDis != dis) {
+      lastDis = dis;
+      t.reset();
+      t.start();
+    }
+    
+    double acceleration = Math.min(t.get()/1, 1);
+
+    setPoint = (dis * 150) - ((r+l) / 2);
+
+    correct = acceleration * vel * setPoint * 0.0003;
+
+    if (Math.abs(correct) > vel) correct = vel * Math.signum(correct);
+    
+    traction(correct, 0);
+
+    SmartDashboard.putNumber("setpoint", dis * 100);
+    SmartDashboard.putNumber("encoders", (r+l) / 2);
+    SmartDashboard.putNumber("correct", correct);
+    SmartDashboard.putBoolean("isMove", isMove());
+    SmartDashboard.putNumber("t.get()", t.get());
+    SmartDashboard.putNumber("acceleration", acceleration);
+
+    //if (correct < .3 && correct > .1) correct = .4;
+    //else if (correct <= .1) correct = .0;
+    
+  }
+
+  public void routeCharge (double vel) {
+
+    correct = navx * 0.0001;
+
     if (correct > vel) correct = vel;
     traction(0, correct);
 
-  } //*/
-
-  public Pose2d getPose() {
-
-    return m_odometry.getPoseMeters();
-
+    if (correct < .3 && correct > .1) correct = .4;
+    else if (correct <= .1) correct = .0;
+    
   }
 
-  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-
-    return new DifferentialDriveWheelSpeeds(
-    ct_lf.getSelectedSensorVelocity() * (Math.PI/4096) * 0.1524
-    , ct_rf.getSelectedSensorVelocity() * (Math.PI/4096) * 0.1524);
-
-  }
-
-  public void resetOdometry(Pose2d pose) {
-
-    resetEncoders();
-    m_odometry.resetPosition(new Rotation2d(), 
-    ct_lf.getSelectedSensorPosition() * (Math.PI* 0.1524)/4096, 
-    ct_rf.getSelectedSensorPosition() * (Math.PI* 0.1524)/4096, 
-    pose);
-
-  }
-
-  public void tankDriveVolts (double leftVolts, double rightVolts) {
-
-    left.setVoltage(-leftVolts);
-    right.setVoltage(-rightVolts);
-    drive.feed();
-
-  }
-
-  public double getAverageEncoderDistance() {
-
-    return (ct_lf.getSelectedSensorPosition() + ct_rf.getSelectedSensorPosition()) * (Math.PI* 0.1524)/4096 / 2.0;
-
-  }
-
-  public void setMaxOutput(double maxOutput) {
-
-    drive.setMaxOutput(maxOutput);
-
+  public boolean isMove () {
+    return Math.abs(setPoint) > 1500;
   }
 
   public void resetEncoders() {
@@ -118,11 +117,12 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     
-    m_odometry.update(new Rotation2d(),  
-    ct_lf.getSelectedSensorPosition() * (Math.PI* 0.1524)/4096, 
-    ct_rf.getSelectedSensorPosition() * (Math.PI* 0.1524)/4096);
-    SmartDashboard.putNumber("ss", ct_lf.getSelectedSensorPosition() * (Math.PI* -0.1524)/4096);
     SmartDashboard.putNumber("ENC_ESQ", ct_lf.getSelectedSensorPosition());
-    SmartDashboard.putNumber("ENC_DIR", ct_lf.getSelectedSensorPosition());
+    SmartDashboard.putNumber("ENC_DIR", ct_rf.getSelectedSensorPosition());
+    SmartDashboard.putNumber("velDrive", correct);
+
+    r = ct_rf.getSelectedSensorPosition();
+    l = ct_lf.getSelectedSensorPosition();
+
   }
 }
