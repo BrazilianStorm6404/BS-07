@@ -23,7 +23,9 @@ public class Drivetrain extends SubsystemBase {
     double correct,r,l, lastDis = 0, setPoint,
            P = 0.00017;
 
-    private Timer t;
+    private Timer t, tIsMove;
+
+    boolean isMove = false;
     
 
   public Drivetrain() {
@@ -52,12 +54,15 @@ public class Drivetrain extends SubsystemBase {
     resetEncoders();
 
     t = new Timer();
+    tIsMove = new Timer();
 
   }
 
   public void traction (double y, double x) {
 
     drive.arcadeDrive(y, x);
+
+    isMove = y != 0 || x != 0;
 
   }
 
@@ -111,6 +116,18 @@ public class Drivetrain extends SubsystemBase {
 
     ct_lf.setSelectedSensorPosition(0);
     ct_rf.setSelectedSensorPosition(0);
+
+  }
+
+  public double timeMove(){
+
+    if(isMove) {      
+      return tIsMove.get();
+
+    } else {
+      tIsMove.reset();
+      return 0;
+    }
 
   }
 

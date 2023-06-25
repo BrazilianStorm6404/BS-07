@@ -22,7 +22,7 @@ public final class Constants {
 
   public static class Elevator {
 
-    public static final int id_elevR      = 13;
+    public static final int id_elevR      = 8;
     public static final int id_elevL      = 14;
     public static final int id_breakPoint = 8;
     public static final int id_lmtLower   = 9;
@@ -31,22 +31,18 @@ public final class Constants {
  
   }
 
-  public static class Arm {
+  public static class Claw {
 
-    public static final int id_arm     = 13;
-    public static final int id_srFront = 8;
-    public static final int id_srBack  = 9;
-
-    public static final int id_roll     = 12;
-    public static final int id1_encRoll = 0;
-    public static final int id2_encRoll = 1;
+    public static final int id_left = 10;
 
   }
 
-  public static class Claw {
+  public static class Pitch {
 
-    public static final int id_left  = 10;
-    public static final int id_right = 11;
+    public static final int id_pitch    = 9;
+    public static final int id_lmtPitch = 10;
+    public static final int id1_enc     = 4;
+    public static final int id2_enc     = 5;
 
   }
 
