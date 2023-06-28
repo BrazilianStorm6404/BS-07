@@ -7,7 +7,6 @@ import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Limelight;
-import frc.robot.subsystems.NeoTeste;
 import frc.robot.subsystems.Pitch;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -25,7 +24,6 @@ public class RobotContainer {
   Elevator sb_elev;
   Claw sb_claw;
   Pitch sb_pitch;
-  NeoTeste neo;
   AutonomousC cmd_autoC;
   AutonomousRL cmd_autoRL;
 
@@ -37,14 +35,12 @@ public class RobotContainer {
     pilot   = new XboxController(Constants.Joystick.id_pilot);
     coPilot = new XboxController(Constants.Joystick.id_copilot);
 
-    //sb_drive = new Drivetrain();
-    //sb_elev  = new Elevator();
-    //sb_claw  = new Claw();
-    //sb_pitch = new Pitch(sb_elev);
+    sb_drive = new Drivetrain();
+    sb_elev  = new Elevator();
+    sb_claw  = new Claw();
+    //sb_pitch = new Pitch();
     //cmd_autoC = new AutonomousC(sb_drive, sb_elev, sb_claw);
     //cmd_autoRL = new AutonomousRL(sb_drive, sb_elev, sb_claw, sb_pitch);
-
-    neo = new NeoTeste();
 
     sb_camera = new Camera();
     sb_ll = new Limelight();
@@ -54,21 +50,15 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-    neo.setDefaultCommand( new RunCommand(() -> {
 
-      //neo.control(coPilot.getLeftY());
-
-    }, neo));
-
-/* 
     //DRIVE
     sb_drive.setDefaultCommand( new RunCommand(() -> {
 
       sb_drive.traction(pilot.getLeftY() * (pilot.getRightBumper() ? .5 : 1), pilot.getLeftX() * (pilot.getRightBumper() ? .5 : 1));
 
     }, sb_drive));
-*/
- /* 
+
+ 
     //ELEVADOR
     sb_elev.setDefaultCommand( new RunCommand(() -> {
 
@@ -96,8 +86,8 @@ public class RobotContainer {
         sb_elev.move((Math.round(coPilot.getLeftY() * 10)/10.0) * .7);
 
       }
-      
-      //sb_elev.adjust(Math.round(-coPilot.getLeftY()*10)/10.0);
+      */
+      sb_elev.adjust(Math.round(-pilot.getRightY()*10)/10.0);
 
       if (pilot.getYButtonReleased()) sb_elev.upStage();
       else if (pilot.getAButtonReleased()) sb_elev.downStage();
@@ -107,25 +97,27 @@ public class RobotContainer {
 
     }, sb_elev));
     
-    */
+    
     //GARRA
-    /*sb_claw.setDefaultCommand( new RunCommand(() -> {
+    sb_claw.setDefaultCommand( new RunCommand(() -> {
 
-      if (pilot.getLeftBumper()) sb_claw.collect(.4);
-      else if (pilot.getRightBumper()) sb_claw.collect(-.4);
+      if (pilot.getLeftBumper()) sb_claw.collect(.6);
+      else if (pilot.getRightBumper()) sb_claw.collect(-.6);
       else    sb_claw.collect(.0);
       
     }, sb_claw));
 
+/* 
     //PITCH_GARRA
     sb_pitch.setDefaultCommand( new RunCommand(() -> {
 
-      sb_pitch.move_pitch(pilot.getRightY(), 0.5);
+      sb_pitch.move_pitch(pilot.getRightY(), 0.7);
       
     }, sb_pitch));
-
 */
+
   }
+
   public Command getAutonomousCommand() {
 
     return null;  /*cmd_autoC;*/

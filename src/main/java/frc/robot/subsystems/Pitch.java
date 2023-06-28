@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
@@ -16,22 +17,26 @@ public class Pitch extends SubsystemBase {
 
   VictorSPX ct_pitch;
   Encoder enc_pitch;
-  DigitalInput lmt_pitch;
+  DigitalInput lmt_pitchFront, lmt_pitchBack;
   double posStages[] = {1000, 2000, 3000, 4000};
   double setPoint, pos;
 
   Elevator elevator;
   Drivetrain drive;
 
-  public Pitch(Elevator elev) {
+  public Pitch() {
 
     ct_pitch  = new VictorSPX(Constants.Pitch.id_pitch);
-    lmt_pitch = new DigitalInput(Constants.Pitch.id_lmtPitch);
+    lmt_pitchFront = new DigitalInput(Constants.Pitch.id_lmtPitchFront);
+    lmt_pitchBack = new DigitalInput(Constants.Pitch.id_lmtPitchBack);
     enc_pitch = new Encoder(Constants.Pitch.id1_enc, Constants.Pitch.id2_enc);
     enc_pitch.setDistancePerPulse(1);
     enc_pitch.reset();
-    elevator = elev;
+    //elevator = elev;
     //drive = dr;
+
+    ct_pitch.setNeutralMode(NeutralMode.Brake);
+
     resetEnc();
 
   }
@@ -47,9 +52,17 @@ public class Pitch extends SubsystemBase {
     }*/
 
 
-    pos = (posStages[elevator.getStage()] + adjust * 5000 - enc_pitch.getDistance()) * 0.001;
+    pos = (adjust * 500 - enc_pitch.getDistance()) * 0.005;
 
-    pos = Math.signum(pos) * Math.min(Math.abs(pos), v);
+    if (pos > 0) {
+
+      pos = Math.signum(pos) * Math.min(Math.abs(pos), 0.2);
+      
+    } else {
+
+      pos = Math.signum(pos) * Math.min(Math.abs(pos), v);
+      
+    }
 
   }
 
@@ -70,7 +83,6 @@ public class Pitch extends SubsystemBase {
 
     SmartDashboard.putNumber("pos_pitch", pos);
     SmartDashboard.putNumber("enc_pitch", enc_pitch.getDistance());
-    SmartDashboard.putNumber("stage_elev", elevator.getStage());
 
   }
 }
