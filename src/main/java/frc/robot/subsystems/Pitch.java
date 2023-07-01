@@ -71,9 +71,9 @@ public class Pitch extends SubsystemBase {
   }
 
   public void updatePitch() {
-    /*if (!lmt_pitch.get()) ct_pitch.set(VictorSPXControlMode.PercentOutput, pos);
-    else ct_pitch.set(VictorSPXControlMode.PercentOutput, 0);
-*/
+    //if (!lmt_pitch.get()) ct_pitch.set(VictorSPXControlMode.PercentOutput, pos);
+    //else ct_pitch.set(VictorSPXControlMode.PercentOutput, 0);
+
     ct_pitch.set(VictorSPXControlMode.PercentOutput, pos);
   }
 

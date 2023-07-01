@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Timer;
@@ -19,6 +21,7 @@ public class Elevator extends SubsystemBase {
   public double[] stages = {0, 300, 600, 1000};
   public int idStage = 0;
   public boolean breakActv = false;
+  public PIDController pid;
 
   public Timer t;
 
@@ -41,6 +44,8 @@ public class Elevator extends SubsystemBase {
     adjust = 0;
     setPoint = 0;
 
+    pid = new PIDController(0.0035, 0, 0);
+
   }
 
   public boolean getLmt() {
@@ -57,7 +62,9 @@ public class Elevator extends SubsystemBase {
 
     setPoint = Math.max(pos + moveStage + adjust, 0);
 
-    double vel = (setPoint - enc) * 0.0035;
+    double vel = (pid.calculate(enc, setPoint));
+
+    //double vel = (setPoint - enc) * 0.003;
 
     if (vel < 0) {
       vel = Math.signum(vel) * Math.min(Math.abs(vel), 0.75);
@@ -69,7 +76,7 @@ public class Elevator extends SubsystemBase {
 
     }
     SmartDashboard.putNumber("ELEVATOR_VEL", vel);
-
+    
   }
 
   public boolean isMove () {
