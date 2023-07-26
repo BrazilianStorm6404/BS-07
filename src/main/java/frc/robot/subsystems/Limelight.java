@@ -1,9 +1,5 @@
 package frc.robot.subsystems;
 
-import java.lang.annotation.Target;
-
-import edu.wpi.first.apriltag.AprilTag;
-import edu.wpi.first.apriltag.AprilTagDetection;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -22,16 +18,18 @@ public class Limelight extends SubsystemBase {
   double area = ta.getDouble(0.0);
   double id   = tid.getDouble(0.0);
   
-  public Limelight() {
+  public Boolean LimeAuto() {
+    return id == 2 || id == 7;
   }
+  
+  /*public int limeSubs() {
+    if(id == 4 || id == 5){
+    }*/
 
   @Override
   public void periodic() {
 
-    SmartDashboard.putNumber("LimelightX", x);
-    SmartDashboard.putNumber("LimelightY", y);
-    SmartDashboard.putNumber("LimelightArea", area);
-    SmartDashboard.putNumber("LimelightID", id);
+    SmartDashboard.putNumber("LL_ID", id);
   
   }
 

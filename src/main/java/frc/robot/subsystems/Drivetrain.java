@@ -18,7 +18,6 @@ public class Drivetrain extends SubsystemBase {
     private WPI_VictorSPX        ct_rb, ct_lb;
     private MotorControllerGroup right, left;
     private DifferentialDrive    drive;
-    private double navx;
 
     double correct,r,l, lastDis = 0, setPoint,
            P = 0.00017;
@@ -40,16 +39,16 @@ public class Drivetrain extends SubsystemBase {
     ct_rb.setNeutralMode(NeutralMode.Brake);
     ct_rf.setNeutralMode(NeutralMode.Brake);
 
-    right = new MotorControllerGroup(ct_rf, ct_rb);
-    left  = new MotorControllerGroup(ct_lf, ct_lb);
-    drive = new DifferentialDrive(right, left);
-
     ct_lf.configFactoryDefault();
     ct_rf.configFactoryDefault();
     ct_lf.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     ct_rf.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     ct_lf.setSensorPhase(true);
     ct_rf.setSensorPhase(false); 
+
+    right = new MotorControllerGroup(ct_rf, ct_rb);
+    left  = new MotorControllerGroup(ct_lf, ct_lb);
+    drive = new DifferentialDrive(right, left);
 
     resetEncoders();
 
@@ -62,6 +61,8 @@ public class Drivetrain extends SubsystemBase {
 
     drive.arcadeDrive(y, x);
 
+    
+
     isMove = y != 0 || x != 0;
 
   }
@@ -73,8 +74,10 @@ public class Drivetrain extends SubsystemBase {
       t.reset();
       t.start();
     }
-    
+
     double acceleration = Math.min(t.get()/1, 1);
+
+    if (r != l) r =l;
 
     setPoint = (dis * 150) - ((r+l) / 2);
 
@@ -83,28 +86,6 @@ public class Drivetrain extends SubsystemBase {
     if (Math.abs(correct) > vel) correct = vel * Math.signum(correct);
     
     traction(correct, 0);
-
-    SmartDashboard.putNumber("setpoint", dis * 100);
-    SmartDashboard.putNumber("encoders", (r+l) / 2);
-    SmartDashboard.putNumber("correct", correct);
-    SmartDashboard.putBoolean("isMove", isMove());
-    SmartDashboard.putNumber("t.get()", t.get());
-    SmartDashboard.putNumber("acceleration", acceleration);
-
-    //if (correct < .3 && correct > .1) correct = .4;
-    //else if (correct <= .1) correct = .0;
-    
-  }
-
-  public void routeCharge (double vel) {
-
-    correct = navx * 0.0001;
-
-    if (correct > vel) correct = vel;
-    traction(0, correct);
-
-    if (correct < .3 && correct > .1) correct = .4;
-    else if (correct <= .1) correct = .0;
     
   }
 

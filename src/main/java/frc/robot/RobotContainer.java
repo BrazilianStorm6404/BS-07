@@ -16,10 +16,6 @@ public class RobotContainer {
 
   XboxController pilot, coPilot;
 
-  boolean setCol1 = true,
-          estado1 = false,
-          stagesActv = false;
-
   Drivetrain sb_drive;
   Elevator sb_elev;
   Claw sb_claw;
@@ -39,8 +35,8 @@ public class RobotContainer {
     sb_elev  = new Elevator();
     sb_claw  = new Claw();
     sb_pitch = new Pitch();
-    cmd_autoC = new AutonomousC(sb_drive, sb_elev, sb_claw);
-    cmd_autoRL = new AutonomousRL(sb_drive, sb_elev, sb_claw, sb_pitch);
+    cmd_autoC = new AutonomousC(sb_drive, sb_claw, sb_pitch);
+    cmd_autoRL = new AutonomousRL(sb_drive, sb_claw, sb_pitch);
 
     sb_camera = new Camera();
     sb_ll = new Limelight();
@@ -50,11 +46,10 @@ public class RobotContainer {
 
   private void configureBindings() {
 
-
     //DRIVE
     sb_drive.setDefaultCommand( new RunCommand(() -> {
 
-      sb_drive.traction(pilot.getLeftY() * (pilot.getRightBumper() ? .5 : 1), pilot.getRightX() * (pilot.getRightBumper() ? .5 : 1));
+      sb_drive.traction(pilot.getRightX() * (pilot.getRightBumper() ? .5 : 1) , pilot.getLeftY() * (pilot.getRightBumper() ? .5 : 1));
 
     }, sb_drive));
 
@@ -62,11 +57,8 @@ public class RobotContainer {
     //ELEVADOR
     sb_elev.setDefaultCommand( new RunCommand(() -> {
 
-      sb_elev.adjust(Math.round(-coPilot.getRightY()*10)/10.0);
-
-      if (coPilot.getYButtonReleased()) sb_elev.upStage();
-      else if (coPilot.getAButtonReleased()) sb_elev.downStage();
-
+      if (coPilot.getYButtonReleased()) sb_elev.upStage(); 
+      if (coPilot.getAButtonReleased()) sb_elev.downStage();
 
     }, sb_elev));
     
@@ -74,46 +66,31 @@ public class RobotContainer {
     //GARRA
     sb_claw.setDefaultCommand( new RunCommand(() -> {
 
-      if (coPilot.getLeftBumper()) sb_claw.collect(.6);
-      else if (coPilot.getRightBumper()) sb_claw.collect(-.5);
+      if      (coPilot.getLeftBumper()) sb_claw.collect(1);
+      else if (coPilot.getLeftBumper()) sb_claw.collect(-1);
       else    sb_claw.collect(.0);
       
     }, sb_claw));
 
-/* 
     //PITCH_GARRA
     sb_pitch.setDefaultCommand( new RunCommand(() -> {
 
-      sb_pitch.move_pitch(pilot.getRightY(), 0.7);
-      
+      sb_pitch.move(coPilot.getLeftY());
+  
     }, sb_pitch));
-*/
+ 
 
   }
-
+  
+  //AUTONOMO
   public Command getAutonomousCommand() {
-
-    return null;  /*cmd_autoC;*/
-
+    /*if(sb_ll.LimeAuto()){
+      return cmd_autoC;
+    }
+    else{
+      return cmd_autoRL;
+    } */
+    return null;
   }
 
 }
-/*
-- teste de giroscopio para equilibrio na balança - 3.1
-
-- estagios do elevador - 2.1
-
-- controle de pitch da garra - 1.1
-	- encoder + limit !
-	-
-
-- mudanças nos controles dos pilotos - 1.2
-
-- limelight (QR, detecção objetos de jogo) - 2.2
-	- coletar
-
-- shuffleboard (auto) - 2.3
-	-  modulo (encapsulado)
- 
-- Sistemas de controle - 3.2
- */

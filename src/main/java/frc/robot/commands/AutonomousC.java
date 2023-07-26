@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.sql.Array;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
@@ -11,20 +9,23 @@ import frc.robot.Pair;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Pitch;
 
 public class AutonomousC extends CommandBase {
 
   Drivetrain sb_drive;
   Elevator   sb_elev;
   Claw       sb_claw;
+  Pitch      sb_pitch;
 
   boolean finished;
   Timer t;
-  final int claw = 1, elevator = 2, drive = 3, clawTimer = 4;
+  final int claw = 1, drive = 2, clawTimer = 3, pitch = 4;
 
   ArrayList<Pair<Double, Integer>> actions = new ArrayList<>(Arrays.asList(
     
-    new Pair<>(-0.5, clawTimer)
+    new Pair<>(750.0, pitch)
+    ,new Pair<>(-0.5, clawTimer)
     ,new Pair<>(2.0, 0)
     ,new Pair<>(0.0, claw)
     ,new Pair<>(-142.0, drive)
@@ -32,15 +33,15 @@ public class AutonomousC extends CommandBase {
 
   ));
 
-  public AutonomousC(Drivetrain dr, Elevator el, Claw cl) {
+  public AutonomousC(Drivetrain dr, Claw cl, Pitch pt) {
 
     addRequirements(dr);
-    addRequirements(el);
     addRequirements(cl);
+    addRequirements(pt);
 
-    sb_drive    = dr;
-    sb_elev     = el;
-    sb_claw     = cl;
+    sb_drive = dr;
+    sb_claw  = cl;
+    sb_pitch = pt;
 
     t = new Timer();
 
@@ -49,8 +50,8 @@ public class AutonomousC extends CommandBase {
   @Override
   public void initialize() {
 
-    //sb_elev.resetEnc_elev();
     sb_drive.resetEncoders();
+    sb_pitch.resetEnc();
 
   }
 
@@ -64,22 +65,15 @@ public class AutonomousC extends CommandBase {
           sb_claw.collect(actions.get(0).firstValue());
           actions.remove(0);
           break;
-
-        /*case 2:
-          sb_elev.move_elev(actions.get(0).firstValue(), .35);
-          if (!sb_elev.isMove()) {
-            actions.remove(0);
-          }
-          break;*/
         
-        case 3:
+        case 2:
           sb_drive.route(.7, actions.get(0).firstValue());
           if (!sb_drive.isMove()) {
             actions.remove(0);
           }
           break;
  
-        case 4:
+        case 3:
           sb_claw.collect(actions.get(0).firstValue());
           sb_claw.setTime(actions.get(1).firstValue());
           if (!sb_claw.isActive()) {
@@ -87,6 +81,14 @@ public class AutonomousC extends CommandBase {
             actions.remove(0);
           }
           break;
+
+        case 4:
+          sb_pitch.move_pitch(actions.get(0).firstValue(), 0.5);
+          if (!sb_pitch.isMove()){
+          actions.remove(0);
+          }
+          break;
+
         }
 
       } 
