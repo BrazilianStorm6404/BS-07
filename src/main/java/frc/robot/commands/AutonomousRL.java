@@ -23,11 +23,11 @@ public class AutonomousRL extends CommandBase {
 
   ArrayList<Pair<Double, Integer>> actions = new ArrayList<>(Arrays.asList(
     
-  new Pair<>(750.0, pitch)
-  ,new Pair<>(-0.5, clawTimer)
+  new Pair<>(600.0, pitch)
+  ,new Pair<>(-1.0, clawTimer)
   ,new Pair<>(2.0, 0)
   ,new Pair<>(0.0, claw)
-  ,new Pair<>(100.0, drive)
+  ,new Pair<>(250.0, drive)
 
   ));
 
@@ -65,7 +65,7 @@ public class AutonomousRL extends CommandBase {
           break;
         
         case 2:
-          sb_drive.route(.7, actions.get(0).firstValue());
+          sb_drive.route(.8, actions.get(0).firstValue());
           if (!sb_drive.isMove()) {
             actions.remove(0);
           }
@@ -74,11 +74,9 @@ public class AutonomousRL extends CommandBase {
         case 3:
           sb_claw.collect(actions.get(0).firstValue());
           sb_claw.setTime(actions.get(1).firstValue());
-          sb_pitch.move_pitch(.5, actions.get(0).firstValue());
           if (!sb_claw.isActive()) {
             actions.remove(1);
             actions.remove(0);
-            actions.remove(2);
           }
           break;
 

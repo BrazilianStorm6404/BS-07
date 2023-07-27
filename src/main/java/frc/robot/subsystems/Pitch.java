@@ -62,8 +62,6 @@ public class Pitch extends SubsystemBase {
 
   public void move_pitch(double v, double pos){
 
-    pos = posStages[idStage];
-    
     pos = (pos - enc) * 0.002;
 
     if (!lmt_pitch.get() && pos < 0) {
@@ -76,7 +74,7 @@ public class Pitch extends SubsystemBase {
   }
 
   public boolean isMove (){
-  return Math.abs(pos) > 700;
+  return Math.abs(enc) > 700;
   }
 
   public void setCurrentPoint() {

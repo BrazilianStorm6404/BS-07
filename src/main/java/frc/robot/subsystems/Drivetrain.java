@@ -77,15 +77,13 @@ public class Drivetrain extends SubsystemBase {
 
     double acceleration = Math.min(t.get()/1, 1);
 
-    if (r != l) r =l;
-
     setPoint = (dis * 150) - ((r+l) / 2);
 
     correct = acceleration * vel * setPoint * 0.0003;
 
     if (Math.abs(correct) > vel) correct = vel * Math.signum(correct);
     
-    traction(correct, 0);
+    traction(0, correct);
     
   }
 
@@ -119,6 +117,9 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("ENC_DIR", ct_rf.getSelectedSensorPosition());
     SmartDashboard.putNumber("velDrive", correct);
 
+    if (ct_rf.getSelectedSensorPosition() > ct_lf.getSelectedSensorPosition()) {
+      ct_rf.setSelectedSensorPosition(ct_lf.getSelectedSensorPosition() + 15000);
+    }
     r = ct_rf.getSelectedSensorPosition();
     l = ct_lf.getSelectedSensorPosition();
 

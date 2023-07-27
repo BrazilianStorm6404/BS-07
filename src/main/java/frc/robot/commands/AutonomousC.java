@@ -3,7 +3,6 @@ package frc.robot.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Pair;
 import frc.robot.subsystems.Claw;
@@ -24,12 +23,11 @@ public class AutonomousC extends CommandBase {
 
   ArrayList<Pair<Double, Integer>> actions = new ArrayList<>(Arrays.asList(
     
-    new Pair<>(750.0, pitch)
-    ,new Pair<>(-0.5, clawTimer)
-    ,new Pair<>(2.0, 0)
-    ,new Pair<>(0.0, claw)
-    ,new Pair<>(-142.0, drive)
-
+  new Pair<>(600.0, pitch)
+  ,new Pair<>(-1.0, clawTimer)
+  ,new Pair<>(2.0, 0)
+  ,new Pair<>(0.0, claw)
+  ,new Pair<>(200.0, drive)
 
   ));
 
@@ -63,11 +61,11 @@ public class AutonomousC extends CommandBase {
       switch(actions.get(0).secundValue()){
         case 1:
           sb_claw.collect(actions.get(0).firstValue());
-          actions.remove(0);
+          actions.remove(0);          
           break;
         
         case 2:
-          sb_drive.route(.7, actions.get(0).firstValue());
+          sb_drive.route(.8, actions.get(0).firstValue());
           if (!sb_drive.isMove()) {
             actions.remove(0);
           }
@@ -83,15 +81,15 @@ public class AutonomousC extends CommandBase {
           break;
 
         case 4:
-          sb_pitch.move_pitch(actions.get(0).firstValue(), 0.5);
-          if (!sb_pitch.isMove()){
-          actions.remove(0);
+          sb_pitch.move_pitch(.5, actions.get(0).firstValue());
+          if (sb_pitch.isMove()) {
+            actions.remove(0);
           }
           break;
-
+          
         }
 
-      } 
+      } else finished = true;
   }
 
   @Override
