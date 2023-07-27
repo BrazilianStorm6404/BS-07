@@ -79,7 +79,7 @@ public class Elevator extends SubsystemBase {
       adjust = 0;
     }*/
     
-    if ((!lmt_up.get() && vel > 0) || (!lmt_lower.get() && vel < 0)) {
+    if (!lmt_lower.get() && vel < 0) {
       vel = 0.0;
     } 
 

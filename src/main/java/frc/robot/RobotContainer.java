@@ -66,8 +66,13 @@ public class RobotContainer {
     //GARRA
     sb_claw.setDefaultCommand( new RunCommand(() -> {
 
-      if      (coPilot.getLeftBumper()) sb_claw.collect(1);
-      else if (coPilot.getLeftBumper()) sb_claw.collect(-1);
+      if      (coPilot.getLeftBumper()) {
+        sb_claw.collect(1);
+        if (coPilot.getBButton()) {
+          sb_claw.collect(.3);
+        }
+      }
+      else if (coPilot.getRightBumper()) sb_claw.collect(-1);
       else    sb_claw.collect(.0);
       
     }, sb_claw));
@@ -81,7 +86,7 @@ public class RobotContainer {
  
 
   }
-  
+
   //AUTONOMO
   public Command getAutonomousCommand() {
     /*if(sb_ll.LimeAuto()){
