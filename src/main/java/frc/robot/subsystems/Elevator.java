@@ -17,7 +17,7 @@ public class Elevator extends SubsystemBase {
   public DigitalInput lmt_lower, lmt_up;
 
   public double pos, enc, adjust, moveStage, setPoint, perdaUp, erro, lastPos, ac, vel, lastAdjust;
-  public double[] stages = {0, 150, 400};
+  public double[] stages = {0, 250, 500};
   public int idStage = 0;
   public boolean breakActv = false;
 
@@ -49,11 +49,36 @@ public class Elevator extends SubsystemBase {
   }
 
 
-  /*public void controlAuto (double h, double v) {
+  public void controlAuto (double v, double h) {
 
-    pos = h;
+    setPoint = h;
 
-  }*/
+    vel = (setPoint - enc) * 0.005;
+
+    if (!lmt_lower.get() && vel < 0) {
+      vel = 0;
+      enc_elev.reset();
+    } 
+
+    if (vel > 0) {
+      vel = Math.signum(vel) * Math.min(Math.abs(vel), 0.1);
+      ct_elevR.set(vel);
+      ct_elevL.set(vel);
+    } 
+    else {
+      vel = Math.signum(vel) * Math.min(Math.abs(vel), 0.2);
+      ct_elevR.set(vel);
+      ct_elevL.set(vel);
+    }
+  }
+
+  public boolean isMove (){
+    return Math.abs(enc) > 420;
+  }
+
+  public boolean isfinal (){
+    return !lmt_lower.get();
+  }
 
   public void updateStages() {
 
@@ -70,30 +95,26 @@ public class Elevator extends SubsystemBase {
     //setPoint =+ adjust;
 
     vel = (setPoint - enc) * ac * 0.005;
+    
 
-    if (!lmt_lower.get()) {
+    if (!lmt_lower.get()){
       enc_elev.reset();
+      if (vel < 0) vel = 0;
     } 
 
     /*if (vel > 0) {
       adjust = 0;
     }*/
     
-    if (!lmt_lower.get() && vel < 0) {
-      vel = 0.0;
-    } 
-
     if (vel > 0) {
       vel = Math.signum(vel) * Math.min(Math.abs(vel), 0.1);
       ct_elevR.set(vel);
       ct_elevL.set(vel);
-
     } 
     else {
       vel = Math.signum(vel) * Math.min(Math.abs(vel), 0.8);
       ct_elevR.set(vel);
       ct_elevL.set(vel);
-
     }
     
   }
@@ -143,10 +164,12 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
 
+    lmt_lower.get();
     enc = enc_elev.getDistance();
-    updateStages();
 
     SmartDashboard.putBoolean("LMT_lower", lmt_lower.get());
+    SmartDashboard.putNumber("VEL_ELEV", vel);
+    SmartDashboard.putNumber("ENC_ELEV", enc);
 
   }
 }

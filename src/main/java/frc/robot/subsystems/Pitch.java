@@ -62,19 +62,29 @@ public class Pitch extends SubsystemBase {
 
   public void move_pitch(double v, double pos){
 
-    pos = (pos - enc) * 0.002;
+    pos = (pos - enc) * 0.003;
 
     if (!lmt_pitch.get() && pos < 0) {
-      ct_pitch.set(0.0);
+      ct_pitch.set(0);
+      enc_pitch.reset();
       } 
 
-    pos = Math.signum(pos) * Math.min(Math.abs(pos), 0.5);
-    ct_pitch.set(pos);
+      if (pos > 0) {
+        pos = Math.signum(pos) * Math.min(Math.abs(pos), 0.8);
+        ct_pitch.set(pos);
+        } else {
+          pos = Math.signum(pos) * Math.min(Math.abs(pos), 0.7);
+          ct_pitch.set(pos);
+        }  
 
   }
 
   public boolean isMove (){
-  return Math.abs(enc) > 700;
+  return Math.abs(enc) > 650;
+  }
+
+  public boolean isfinal(){
+    return !lmt_pitch.get();
   }
 
   public void setCurrentPoint() {
@@ -105,6 +115,8 @@ public class Pitch extends SubsystemBase {
   
   @Override
   public void periodic() {
+
+    lmt_pitch.get();
     enc = enc_pitch.getDistance();
 
     SmartDashboard.putNumber("pos_pitch", pos);

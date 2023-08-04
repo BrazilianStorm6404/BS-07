@@ -88,7 +88,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public boolean isMove () {
-    return Math.abs(setPoint) > 1500;
+    return r+l > 65000;
   }
 
   public void resetEncoders() {
