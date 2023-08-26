@@ -89,13 +89,7 @@ public class RobotContainer {
   //AUTONOMO
   public Command getAutonomousCommand() {
     
-    if(sb_ll.LimeC() == true){
-      return cmd_autoC;
-    } else if (sb_ll.LimeRL() == true){
-      return cmd_autoRL;
-    } else{
-      return cmd_autoCone;
-    }
+    return cmd_autoRL;
   }
 
 }

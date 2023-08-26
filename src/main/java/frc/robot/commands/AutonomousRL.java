@@ -25,7 +25,7 @@ public class AutonomousRL extends CommandBase {
   ,new Pair<>(-.9, clawTimer)
   ,new Pair<>(2.0, 0)
   ,new Pair<>(0.0, claw)
-  ,new Pair<>(240.0, drive)
+  ,new Pair<>(270.0, drive)
 
   ));
 

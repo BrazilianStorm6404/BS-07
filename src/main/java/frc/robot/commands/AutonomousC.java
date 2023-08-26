@@ -17,7 +17,7 @@ public class AutonomousC extends CommandBase {
 
   boolean finished;
   Timer t;
-  final int claw = 1, drive = 2, clawTimer = 3, pitch = 4;
+  final int claw = 1, drive = 2, clawTimer = 3, pitch = 4, rpitch = 5;
 
   ArrayList<Pair<Double, Integer>> actions = new ArrayList<>(Arrays.asList(
     
@@ -25,7 +25,8 @@ public class AutonomousC extends CommandBase {
   ,new Pair<>(-.9, clawTimer)
   ,new Pair<>(2.0, 0)
   ,new Pair<>(0.0, claw)
-  ,new Pair<>(190.0, drive)
+  ,new Pair<>(0.0, rpitch)
+  ,new Pair<>(180.0, drive)
 
   ));
 
@@ -63,7 +64,7 @@ public class AutonomousC extends CommandBase {
           break;
         
         case 2:
-          sb_drive.route(.8, actions.get(0).firstValue());
+          sb_drive.route(.7, actions.get(0).firstValue());
           if (sb_drive.isMove()) {
             actions.remove(0);
           }
@@ -82,6 +83,13 @@ public class AutonomousC extends CommandBase {
           sb_pitch.move_pitch(.8, actions.get(0).firstValue());
           sb_claw.collect(0.3);
           if (sb_pitch.isMove()) {
+            actions.remove(0);
+          }
+          break;
+
+        case 5:
+          sb_pitch.move_pitch(.9, actions.get(0).firstValue());
+          if (sb_pitch.isfinal()) {
             actions.remove(0);
           }
           break;

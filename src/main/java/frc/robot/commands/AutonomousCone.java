@@ -30,7 +30,7 @@ public class AutonomousCone extends CommandBase {
   ,new Pair<>(0.0, claw)
   ,new Pair<>(0.0, rpitch)
   ,new Pair<>(0.0, relev)
-  ,new Pair<>(240.0, drive)
+  ,new Pair<>(270.0, drive)
 
   ));
 
